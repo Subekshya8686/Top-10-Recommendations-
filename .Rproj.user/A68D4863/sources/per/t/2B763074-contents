@@ -1,0 +1,85 @@
+library(tidyverse)
+library(plotly)
+# read.csv is default but slow
+mydata = read_csv("data.csv") # _csv for only when tidyverse library used
+mydata
+
+world_bank_pop= read_csv("WP.csv")
+world_bank_pop
+
+ggplot(world_bank_pop, aes(y=`1961`)) +geom_boxplot()
+a=ggplotly(a, tooltip = "text")
+print(a)
+
+
+
+url = "https://raw.githubusercontent.com/fivethirtyeight/data/master/unisex-names/unisex_names_table.csv"
+data = read_csv(url)
+data
+
+View(arrange(data,gap))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

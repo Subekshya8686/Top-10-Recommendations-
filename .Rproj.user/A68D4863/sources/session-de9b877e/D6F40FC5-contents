@@ -1,0 +1,58 @@
+install.packages("gapminder")
+install.packages("gganimate")
+install.packages("gifski")
+
+library(tidyverse)
+library(ggplot2)
+library(gganimate)
+library(gapminder)
+library(gifski)
+
+options(scipen = 999)
+
+view(gapminder)
+
+gapminder = ggplot(data= gapminder, 
+                   aes(x= gdpPercap, y= lifeExp, 
+                       color= continent, size= pop))+ 
+  geom_point(alpha= 0.7, stroke = 0)+
+  theme_minimal()+
+  scale_size(range = c(2,12), guide= "none")+ 
+  scale_x_log10()+
+  labs(title="Life Expactancy vs GDP per Capita by Country", 
+       x= "GDP Per Capita", y="Life Expectancy", 
+       color= "Continent",
+       caption = "Source: Professor Hans Rosling gapminder Analysis")+
+  theme(axis.title = element_text(),
+        text = element_text(family = "serif"),
+        legend.text = element_text(size= 10))+
+  scale_color_brewer(palette = "Set2")
+
+
+gapminder.animate = gapminder+ 
+  transition_time(year)+
+  labs(subtitle = "Year: {frame_time}")
+
+animate(gapminder.animate, renderer = gifski_renderer(),
+        width= 1024,
+        height= 768,
+        res= 200,
+        fps= 3)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

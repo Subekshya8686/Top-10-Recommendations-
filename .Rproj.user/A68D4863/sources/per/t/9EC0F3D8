@@ -1,0 +1,27 @@
+{
+    "id": "9EC0F3D8",
+    "path": "E:/DataScience/Top_10_Recommendations/code/cleaning/crime_data_cleaning.R",
+    "project_path": "cleaning/crime_data_cleaning.R",
+    "type": "r_source",
+    "hash": "2544028864",
+    "contents": "",
+    "dirty": false,
+    "created": 1721242630952.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "tempName": "Untitled1",
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "59,0",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1721277127,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1721277127315,
+    "read_only": false,
+    "read_only_alternatives": []
+}

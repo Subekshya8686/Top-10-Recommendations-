@@ -1,0 +1,55 @@
+library(tidyverse)
+library(rvest)  ## a package for web scraping as it makes it easy to pass html 
+library(stringr)  ## a package used for string manipulation
+library(tidyr)    # a package used for tidy/ cleaning data
+library(lubridate) ## a package for working with dates and times
+
+url = "http://espn.go.com/nfl/superbowl/history/winners"
+page = read_html(url)
+page
+
+
+sb_table = html_nodes(page, 'table')
+sb = html_table(sb_table)[[1]]
+sb
+
+
+sb = sb[c(-1,-2),]
+names(sb) = c("number", "date", "site", "result")
+sb
+sb = as_tibble(sb)
+sb
+
+
+mutate(sb,number=1:nrow(sb))
+mutate(sb,date=mdy(date))
+separate(sb,site,c("stadium","city",NA),sep='[()]')
+separate(sb,result,c("winner","loser"),sep=', ')
+
+pattern = ' \\d+$'
+separate(sb,result,c("winner","loser"),sep=', ') %>%
+  mutate(winnerscore=as.numeric(str_extract(winner,pattern))) %>%
+  mutate(winner=gsub(pattern,"",winner)) %>% 
+  mutate(loserscore=as.numeric(str_extract(loser,pattern))) %>% 
+  mutate(loser=gsub(pattern,"",loser))
+
+
+# Pipe
+pattern = ' \\d+$'
+sb %>%
+  mutate(number=1:nrow(sb)) %>%
+  mutate(date=mdy(date)) %>%
+  separate(site,c("stadium","city",NA),sep='[()]') %>%
+  separate(result,c("winner","loser"),sep=', ') %>%
+  mutate(winnerscore=as.numeric(str_extract(winner,pattern))) %>%
+  mutate(winner=gsub(pattern,"",winner)) %>% 
+  mutate(loserscore=as.numeric(str_extract(loser,pattern))) %>% 
+  mutate(loser=gsub(pattern,"",loser)) %>% 
+  mutate(margin_of_win = winnerscore - loserscore) %>% 
+  ggplot(aes(x = date, y = margin_of_win)) +
+  geom_point() +
+  labs(title = "Scatterplot of Date vs. Margin of Win",
+       x = "Date",
+       y = "Margin of Win")
+
+
