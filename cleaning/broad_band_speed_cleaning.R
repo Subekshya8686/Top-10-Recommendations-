@@ -4,36 +4,20 @@ library(purrr)
 library(tidyr)
 library(tidyverse)
 
-# Function to clean column names
-clean_names <- function(df) {
-  colnames(df) <- tolower(colnames(df))
-  colnames(df) <- gsub(" ", "_", colnames(df))
-  return(df)
-}
-
-# Function to read and clean data from a given file
-read_and_clean_csv <- function(file_path) {
-  # Read CSV file
-  data <- read_csv(file_path)
-  
-  # Clean column names
-  data <- clean_names(data)
-  
-  # Additional cleaning steps (if necessary)
-  data_clean <- data %>%
-    mutate(across(where(is.character), ~na_if(.x, "")))
-  
-  return(data_clean)
-}
-
 # Define file paths
 file_paths <- c(
   "E:/DataScience/Top_10_Recommendations/obtain data/broad_band_speed/201805_fixed_pc_performance_r03.csv",
   "E:/DataScience/Top_10_Recommendations/obtain data/broad_band_speed/201809_fixed_pc_coverage_r01.csv"
 )
 
-# Read and clean each CSV file
-cleaned_data <- map(file_paths, read_and_clean_csv)
+# Read and clean data from each file using a pipeline
+cleaned_data <- map(file_paths, ~ read_csv(.x) %>%
+                      # Clean column names
+                      rename_with(~ tolower(.)) %>%
+                      rename_with(~ gsub(" ", "_", .)) %>%
+                      # Replace NA values with 0
+                      mutate(across(everything(), ~ replace_na(.x, 0)))
+)
 
 # Merge cleaned data into one dataframe
 merged_data <- bind_rows(cleaned_data)
@@ -44,10 +28,10 @@ merged_file_path <- "E:/DataScience/Top_10_Recommendations/cleaned data/merged_b
 # Save merged data to CSV file
 write_csv(merged_data, merged_file_path)
 
-# View merged data (optional)
+# View merged data
 print("Data from both files merged and saved successfully!")
 
-
-#view(merged_data)
+# Optional: View merged data
+View(merged_data)
 merged_data
-cleaned_data
+colnames(merged_data)

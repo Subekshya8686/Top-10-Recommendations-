@@ -1,28 +1,50 @@
-library(readr)  # For reading CSV files
-library(dplyr)  # For data manipulation functions
-library(tidyverse)
+library(readr)   # For reading CSV files
+library(dplyr)   # For data manipulation functions
+library(tidyr)   # For handling missing values
 
-# Set your working directory to the location of your CSV files
-setwd("E:/DataScience/Top_10_Recommendations/obtain data/school/")
-
-# Function to read and clean data from a directory
-read_and_clean_data <- function(directory) {
-  files <- list.files(path = directory, pattern = "*.csv", full.names = TRUE)
-  data_list <- lapply(files, read_csv)
-  cleaned_data <- lapply(data_list, na.omit)  # Clean each dataset
-  merged_data <- Reduce(function(x, y) merge(x, y, all = TRUE), cleaned_data)  # Merge datasets
-  return(merged_data)
+# Define function to read, clean, and standardize data from a directory
+read_and_clean_data <- function(directory, county_name, year) {
+  files <- list.files(path = directory, pattern = "*.csv", full.names = TRUE, recursive = TRUE)
+  
+  data_list <- lapply(files, function(file) {
+    df <- read_csv(file)
+    # Standardize column types: Convert all columns to character
+    df <- df %>%
+      mutate(across(everything(), as.character)) %>%
+      # Replace NA values with "0"
+      mutate(across(everything(), ~ replace_na(.x, "0"))) %>%
+      # Add the county and year columns
+      mutate(county = county_name, year = year)
+    return(df)
+  })
+  
+  # Combine all data frames into one
+  combined_data <- bind_rows(data_list)
+  return(combined_data)
 }
 
-# Read and clean data from Bristol and Cornwall directories
-bristol_data <- read_and_clean_data("bristol/2020-2021")
-cornwall_data <- read_and_clean_data("cornwall/2020-2021")
+# Read and clean data from Bristol directories
+bristol_data_2021_2022 <- read_and_clean_data("E:/DataScience/Top_10_Recommendations/obtain data/school/bristol/2021-2022", "Bristol", "2021-2022")
+bristol_data_2022_2023 <- read_and_clean_data("E:/DataScience/Top_10_Recommendations/obtain data/school/bristol/2022-2023", "Bristol", "2022-2023")
 
-# Merge the data from both locations
-merged_data <- merge(bristol_data, cornwall_data, all = TRUE)  # Adjust merge parameters as needed
+# Read and clean data from Cornwall directories
+cornwall_data_2021_2022 <- read_and_clean_data("E:/DataScience/Top_10_Recommendations/obtain data/school/cornwall/2021-2022", "Cornwall", "2021-2022")
+cornwall_data_2022_2023 <- read_and_clean_data("E:/DataScience/Top_10_Recommendations/obtain data/school/cornwall/2022-2023", "Cornwall", "2022-2023")
 
-# Save merged data to a new CSV file if needed
-write_csv(merged_data, "E:/DataScience/Top_10_Recommendations/cleaned data/merged_schools_data.csv")  # row.names = FALSE by default
+# Combine data from all locations and years
+combined_data <- bind_rows(
+  bristol_data_2021_2022, bristol_data_2022_2023,
+  cornwall_data_2021_2022, cornwall_data_2022_2023
+)
 
-merged_data
-view(merged_data)
+# Keep only the desired columns
+desired_columns <- c("PCODE","year", "SCHNAME", "ATT8SCR", "URN", "TOWN", "SCHOOLTYPE", "OFSTEDRATING","county")
+filtered_data <- combined_data %>%
+  select(all_of(desired_columns))
+
+
+# Define the path to save the cleaned data
+output_path <- "E:/DataScience/Top_10_Recommendations/cleaned data/filtered_school_data.csv"
+
+# Write the filtered data to a CSV file
+write_csv(filtered_data, output_path)

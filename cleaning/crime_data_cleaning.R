@@ -1,61 +1,29 @@
-# Install and load necessary packages
-#install.packages(c("dplyr", "readr", "purrr"))
-library(dplyr)
+# Load the necessary packages
 library(readr)
-library(purrr)
-library(tidyverse)
+library(dplyr)
+library(lubridate)  # For date handling
 
-# Function to clean column names
-clean_names <- function(df) {
-  colnames(df) <- tolower(colnames(df))
-  colnames(df) <- gsub(" ", "_", colnames(df))
-  return(df)
-}
-
-# Define a function to read and clean crime data
-read_and_clean_crime_data <- function(folder_path) {
-  # List all CSV files in the directory, including subdirectories
-  files <- list.files(folder_path, recursive = TRUE, full.names = TRUE, pattern = "\\.csv$")
-  
-  # Function to read a single file with specified column types
-  read_crime_csv <- function(file) {
-    read_csv(file, col_types = cols(
-      `Crime ID` = col_character(),
-      `Month` = col_character(),
-      `Reported by` = col_character(),
-      `Falls within` = col_character(),
-      `Location` = col_character(),
-      `LSOA code` = col_character(),
-      `LSOA name` = col_character(),
-      `Crime type` = col_character(),
-      `Last outcome category` = col_character(),
-      `Context` = col_logical(),
-      `Longitude` = col_double(),
-      `Latitude` = col_double()
-    ))
-  }
-  
-  # Read all CSV files and combine them into a single dataframe
-  crime_data <- map_df(files, read_crime_csv)
-  
-  # Perform cleaning steps
-  crime_data_clean <- crime_data %>%
-    clean_names() %>%
-    filter(!is.na(crime_type)) %>%
-    mutate(across(where(is.character), ~na_if(.x, "")))
-  
-  return(crime_data_clean)
-}
-
-# Define path to the crime data folder
+# Define the path to the crime data folder
 crime_data_path <- "E:/DataScience/Top_10_Recommendations/obtain data/crime_data"
-cleaned_data_path <- "E:/DataScience/Top_10_Recommendations/cleaned data/crime_data_cleaned.csv"
+cleaned_data_path <- "E:/DataScience/Top_10_Recommendations/cleaned data/crime_data_summary_cleaned.csv"
 
+# Load and clean the crime data
+crime_data <- list.files(crime_data_path, recursive = TRUE, full.names = TRUE, pattern = "\\.csv$") %>%
+  map_df(~ read_csv(.x, col_names = FALSE)) %>%
+  mutate(
+    # Convert the 'Date' column to a Date type and extract the year
+    Year = year(ymd(paste0(X2, "-01")))
+  )
 
-# Read and clean crime data
-crime_data_clean <- read_and_clean_crime_data(crime_data_path)
+# Calculate the total number of crimes by Year, CrimeType, and FallsWithin
+crime_summary <- crime_data %>%
+  group_by(Year = Year, CrimeType = X10, FallsWithin = X4) %>%
+  summarize(TotalCrimes = n(), .groups = 'drop')
 
-# Save cleaned crime data to the specified path
-write_csv(crime_data_clean, cleaned_data_path)
+# View the summarized data
+print(crime_summary)
+# Define the path for the cleaned data output
+cleaned_data_path <- "E:/DataScience/Top_10_Recommendations/cleaned data/cleaned_crime_summary.csv"
 
-View(crime_data_clean)
+# Write the cleaned data to a CSV file using the `file` argument
+write_csv(crime_summary, file = cleaned_data_path)

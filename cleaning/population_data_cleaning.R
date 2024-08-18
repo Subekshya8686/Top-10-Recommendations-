@@ -11,10 +11,6 @@ population_data <- read_csv(population_data_path)
 # Check column names before cleaning (if necessary)
 print(colnames(population_data))
 
-# Perform any necessary data cleaning steps
-# Example: Removing rows with NA values
-population_data <- na.omit(population_data)
-
 # Define path for cleaned file
 cleaned_population_data_path <- "E:/DataScience/Top_10_Recommendations/cleaned data/cleaned_population_data.csv"
 
