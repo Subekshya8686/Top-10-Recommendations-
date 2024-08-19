@@ -94,10 +94,8 @@ if ("CrimeRatePer1000" %in% colnames(final_data_with_prices) && nrow(final_data_
   ggplot(final_data_with_prices, aes(x = CrimeRatePer1000, y = Price)) +
     geom_point() +
     geom_smooth(method = "lm", col = "blue") +
-    scale_x_continuous(labels = scales::comma_format(), 
-                       breaks = scales::pretty_breaks()) +
-    scale_y_continuous(labels = scales::comma_format(), 
-                       breaks = scales::pretty_breaks()) +
+    scale_x_continuous(labels = scales::comma_format()) +
+    scale_y_continuous(labels = scales::comma_format()) +
     labs(
       title = "House Price vs Drug Crime Rate (2022)",
       x = "Drug Crime Rate per 1000 People",
@@ -108,15 +106,6 @@ if ("CrimeRatePer1000" %in% colnames(final_data_with_prices) && nrow(final_data_
   print("No data available for modeling or 'CrimeRatePer1000' column is missing.")
 }
 
-ggplot(final_data_with_prices, aes(x = CrimeRatePer1000, y = Price)) +
-  geom_point(alpha = 0.6) +
-  geom_smooth(method = "lm", col = "black", linetype = "dashed") +
-  labs(
-    title = "House Prices vs Drug Crime Rate (Colored by Property Type)",
-    x = "Drug Crime Rate per 1000 People",
-    y = "House Price (£)"
-  ) +
-  theme_minimal() +
-  scale_color_brewer(palette = "Set1")
+
 
 
