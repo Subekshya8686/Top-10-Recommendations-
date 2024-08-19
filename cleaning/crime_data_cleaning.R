@@ -9,15 +9,11 @@ cleaned_data_path <- "E:/DataScience/Top_10_Recommendations/cleaned data/crime_d
 
 # Load and clean the crime data
 crime_data <- list.files(crime_data_path, recursive = TRUE, full.names = TRUE, pattern = "\\.csv$") %>%
-  map_df(~ read_csv(.x, col_names = FALSE)) %>%
-  mutate(
-    # Convert the 'Date' column to a Date type and extract the year
-    Year = year(ymd(paste0(X2, "-01")))
-  )
+  map_df(~ read_csv(.x))
 
 # Calculate the total number of crimes by Year, CrimeType, and FallsWithin
 crime_summary <- crime_data %>%
-  group_by(Year = Year, CrimeType = X10, FallsWithin = X4) %>%
+  group_by(Year = Month, CrimeType= `Crime type`, FallsWithin= `Falls within`, `LSOA code`) %>%
   summarize(TotalCrimes = n(), .groups = 'drop')
 
 # View the summarized data
@@ -27,3 +23,4 @@ cleaned_data_path <- "E:/DataScience/Top_10_Recommendations/cleaned data/cleaned
 
 # Write the cleaned data to a CSV file using the `file` argument
 write_csv(crime_summary, file = cleaned_data_path)
+colnames(crime_summary)
